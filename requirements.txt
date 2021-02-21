@@ -1,0 +1,5 @@
+tqdm~=4.36.1
+termcolor~=1.1.0
+playsound~=1.2.2
+pandas~=0.25.1
+osascript~=2020.12.3
