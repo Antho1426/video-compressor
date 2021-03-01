@@ -79,19 +79,19 @@ else: # in case we are in "debug mode"
 
 
 ## Initializations
-# Tests (clipboard_value example for defining the TARGET_DIRECTORY)
-#======
-#--- DIRECTORY PATH
-#argsPath = project_path + '/videoSamples'
-#--- invalid DIRECTORY PATH
-#argsPath = project_path + '/vid'
-#--- VIDEO FILE PATH
-#argsPath = project_path + '/videoSamples/input 23 -1.mp4'
-#--- invalid VIDEO FILE PATH
-#argsPath = project_path + '/videoSamples/in.mp4'
-#======
+if debugModeOn:
+    # Tests (clipboard_value example for defining the TARGET_DIRECTORY)
+    #======
+    #--- DIRECTORY PATH
+    #argsPath = project_path + '/videoSamples'
+    #--- invalid DIRECTORY PATH
+    #argsPath = project_path + '/vid'
+    #--- VIDEO FILE PATH
+    argsPath = project_path + '/videoSamples/input 23 -1.mp4'
+    #--- invalid VIDEO FILE PATH
+    #argsPath = project_path + '/videoSamples/in.mp4'
+    #======
 
-space_in_video_name = False
 path_case = ''
 files = []
 
@@ -218,51 +218,48 @@ if not os.path.isdir(compressed_videos_folder_path): # cf.: "How to find if dire
 print('4) Looping over the list of video files...')
 for file in tqdm(files):
 
-   if ' ' in file:
-      # A) Renaming the video file in case its name contains spaces and defining file_src and file_dst
-      print('\n\n A) Renaming the video file in case its name contains spaces and defining file_src and file_dst')
-      space_in_video_name = True
-      copied_file_path = file.replace(str(parent_directory), compressed_videos_folder_path)
-      returned_value = copyfile(file, copied_file_path)
-      # Renaming the copied video file
-      copied_file_path_without_spaces = copied_file_path.replace(' ', '')
-      os.rename(copied_file_path, copied_file_path_without_spaces)
-      # Moving the copied video file back into the TARGET_DIRECTORY folder
-      copied_file_path_without_spaces_in_TARGET_DIRECTORY = copied_file_path_without_spaces.replace(compressed_videos_folder_path, str(parent_directory))
-      shutil.move(copied_file_path_without_spaces, copied_file_path_without_spaces_in_TARGET_DIRECTORY)
-      # Correspondingly adjusting the current "file_src" and "file_dst" variables
-      file_src = copied_file_path_without_spaces_in_TARGET_DIRECTORY
-      file_dst = copied_file_path_without_spaces
+    # A) Finding the extension of the current video file (either ".mp4" or ".mov")
+    print(' A) Finding the extension of the current video file (either ".mp4" or ".mov")')
+    extension = file[-4:]
 
-   else:
-      # A) Defining file_src and file_dst in case the video file name does NOT contain any space
-      print('\n\n A) Defining file_src and file_dst in case the video file name does NOT contain any space')
-      file_src = file
-      file_dst = file.replace(str(parent_directory), compressed_videos_folder_path)
+    # B) Storing the name of the current video file
+    print(' B) Storing the name of the current video file')
+    video_name = file.split('/')[-1]
 
-   # B) Defining the current video compression command
-   print(' B) Defining the current video compression command')
-   # (Cf.: "Compressing mp4 files, listing directory contents, and copying files to a remote server in Python" (http://www.lewisu.edu/experts/wordpress/index.php/compressing-mp4-files-listing-directory-contents-and-copying-files-to-a-remote-server-in-python/))
-   # (Cf.: "How To Resize a Video Clip in Python" (https://stackoverflow.com/questions/28361056/how-to-resize-a-video-clip-in-python))
-   # (Cf.: "How can I make ffmpeg be quieter/less verbose?" (https://superuser.com/questions/326629/how-can-i-make-ffmpeg-be-quieter-less-verbose))
-   # The CRF (Constant Rate Factor), which, in this case, is 35, can normally range from 18 to 24, where a higher number will compress the output to a smaller size
-   if changeResolution:
-       command = 'ffmpeg -i {0} -vf scale={1}:{2} -vcodec libx264 -crf {3} {4} -v quiet -stats'.format(
-           file_src, WIDTH, HEIGHT, CRF, file_dst)
-   else:
-       command = 'ffmpeg -i {0} -vcodec libx264 -crf {1} {2} -v quiet -stats'.format(
-           file_src, CRF, file_dst)
+    # C) Creating a temporary copy of the video file to compress inside the compressedVideo folder
+    print(' C) Creating a temporary copy of the video file to compress inside the compressedVideo folder')
+    temporary_video_file_path = str(parent_directory) + '/compressedVideos/currentVideoToCompress' + extension
+    returned_value = copyfile(file, temporary_video_file_path)
 
-   # C) Running current command in Terminal
-   print(' C) Running current command in Terminal')
-   returned_value = os.system(command)
+    # D) Defining file_src and file_dst
+    print(' D) Defining file_src and file_dst')
+    file_src = temporary_video_file_path
+    file_dst = str(parent_directory) + '/compressedVideos/currentVideoCOMPRESSED' + extension
 
-   if space_in_video_name:
-      # D) Deleting the copied video file in case it has been created
-      print(' D) Deleting the copied video file in case it has been created')
-      os.remove(file_src)
-      # Resetting the space_in_video_name boolean variable to False
-      space_in_video_name = False
+    # E) Defining the current video compression command
+    print(' E) Defining the current video compression command')
+    # (Cf.: "Compressing mp4 files, listing directory contents, and copying files to a remote server in Python" (http://www.lewisu.edu/experts/wordpress/index.php/compressing-mp4-files-listing-directory-contents-and-copying-files-to-a-remote-server-in-python/))
+    # (Cf.: "How To Resize a Video Clip in Python" (https://stackoverflow.com/questions/28361056/how-to-resize-a-video-clip-in-python))
+    # (Cf.: "How can I make ffmpeg be quieter/less verbose?" (https://superuser.com/questions/326629/how-can-i-make-ffmpeg-be-quieter-less-verbose))
+    # The CRF (Constant Rate Factor), which, in this case, is 35, can normally range from 18 to 24, where a higher number will compress the output to a smaller size
+    if changeResolution:
+        command = 'ffmpeg -i {0} -vf scale={1}:{2} -vcodec libx264 -crf {3} {4} -v quiet -stats'.format(
+            file_src, WIDTH, HEIGHT, CRF, file_dst)
+    else:
+        command = 'ffmpeg -i {0} -vcodec libx264 -crf {1} {2} -v quiet -stats'.format(
+            file_src, CRF, file_dst)
+
+    # F) Running current command in Terminal
+    print(' F) Running current command in Terminal')
+    returned_value = os.system(command)
+
+    # G) Renaming the compressed video file according to its original version
+    print(' G) Renaming the compressed video file according to its original version')
+    os.rename(file_dst, file_dst.replace(file_dst.split('/')[-1], video_name))
+
+    # H) Removing the file_src and file_dst video files
+    print(' H) Removing the file_src and file_dst video files')
+    os.remove(file_src)
 
 # Printing success message
 if len(files) > 1:
