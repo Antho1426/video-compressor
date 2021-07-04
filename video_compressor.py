@@ -162,6 +162,8 @@ if path.is_file():
                subtitle='Video compression failed :-(',
                message='Invalid video file path...',
                sound_path='/System/Library/Sounds/Sosumi.aiff')
+        # Exiting the Terminal window
+        osascript.run('tell application "Terminal" to close first window')
         # Exiting the program
         exit(1)
 
@@ -184,6 +186,8 @@ elif path.is_dir():
                subtitle='Video compression failed :-(',
                message='No video file in directory...',
                sound_path='/System/Library/Sounds/Sosumi.aiff')
+        # Exiting the Terminal window
+        osascript.run('tell application "Terminal" to close first window')
         # Exiting the program
         exit(1)
 
@@ -198,6 +202,8 @@ else:
            subtitle='Video compression failed :-(',
            message='Invalid video file or directory path...',
            sound_path='/System/Library/Sounds/Sosumi.aiff')
+    # Exiting the Terminal window
+    osascript.run('tell application "Terminal" to close first window')
     # Exiting the program
     exit(1)
 
