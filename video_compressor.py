@@ -163,7 +163,7 @@ if path.is_file():
                message='Invalid video file path...',
                sound_path='/System/Library/Sounds/Sosumi.aiff')
         # Exiting the Terminal window
-        osascript.run('tell application "Terminal" to close first window')
+        osascript.run('tell application "iTerm2" to close first window')
         # Exiting the program
         exit(1)
 
@@ -187,7 +187,7 @@ elif path.is_dir():
                message='No video file in directory...',
                sound_path='/System/Library/Sounds/Sosumi.aiff')
         # Exiting the Terminal window
-        osascript.run('tell application "Terminal" to close first window')
+        osascript.run('tell application "iTerm2" to close first window')
         # Exiting the program
         exit(1)
 
@@ -203,7 +203,7 @@ else:
            message='Invalid video file or directory path...',
            sound_path='/System/Library/Sounds/Sosumi.aiff')
     # Exiting the Terminal window
-    osascript.run('tell application "Terminal" to close first window')
+    osascript.run('tell application "iTerm2" to close first window')
     # Exiting the program
     exit(1)
 
@@ -280,4 +280,4 @@ notify(title='video_compressor.py',
 
 # Exiting the Terminal window in case the program has been triggered by Alfred
 # (Cf.: How do I close the Terminal in OSX from the command line? (https://superuser.com/questions/158375/how-do-i-close-the-terminal-in-osx-from-the-command-line/1385450))
-osascript.run('tell application "Terminal" to close first window')
+osascript.run('tell application "iTerm2" to close first window')
