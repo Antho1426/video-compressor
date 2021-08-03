@@ -33,7 +33,10 @@ Important point to notice:
   runs in a Terminal window. The Terminal window is exited automatically at the
   end of the program using an Osascript command.
   
-<img src="video_compressor.gif" alt="video_compressor-gif" style="width: 640px;"/>
+<p align="center">
+	<img src="video_compressor.gif" alt="video_compressor-gif" style="width: 640px;"/>
+</p>
+
   
 ## 2. Getting started
 
