@@ -26,6 +26,7 @@ os.chdir(project_path) # setting the current working directory based on the path
 
 ## Required packages
 import os
+import cv2
 import shutil
 import osascript
 from tqdm import tqdm # for having a nice progress bar
@@ -45,8 +46,6 @@ from pandas.io.clipboard import clipboard_get
 #++++++++++++
 CRF = 35 # Constant Rate Factor
 changeResolution = True
-WIDTH = 854 #1920 #1280 #854
-HEIGHT = 480 #1080 #720 #480
 #++++++++++++
 # Resolution and aspect ratio examples:
 # (Cf.: "Video resolution & aspect ratios" (https://support.google.com/youtube/answer/6375112?co=GENIE.Platform%3DDesktop&hl=en))
@@ -99,6 +98,19 @@ files = []
 
 
 ## Function
+
+
+def get_video_dimensions(video_path: str):
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise ValueError(f"Cannot open video file: {video_path}")
+    
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    cap.release()
+    
+    return width, height
+
 
 def notify(title, subtitle, message, sound_path):
     """
@@ -249,8 +261,10 @@ for file in tqdm(files):
     # (Cf.: "How can I make ffmpeg be quieter/less verbose?" (https://superuser.com/questions/326629/how-can-i-make-ffmpeg-be-quieter-less-verbose))
     # The CRF (Constant Rate Factor), which, in this case, is 35, can normally range from 18 to 24, where a higher number will compress the output to a smaller size
     if changeResolution:
+        width, height = get_video_dimensions(file_src)
+        width_resized, height_resized = int(width/2), int(height/2)
         command = 'ffmpeg -i {0} -vf scale={1}:{2} -vcodec libx264 -crf {3} {4} -v quiet -stats'.format(
-            file_src, WIDTH, HEIGHT, CRF, file_dst)
+            file_src, width_resized, height_resized, CRF, file_dst)
     else:
         command = 'ffmpeg -i {0} -vcodec libx264 -crf {1} {2} -v quiet -stats'.format(
             file_src, CRF, file_dst)
